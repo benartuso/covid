@@ -1,0 +1,130 @@
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Land Guzzlers</title>
+	
+	<style>
+		/*Graphic Styles*/
+		body {
+			text-align: left;
+            font-family:Avenir, Helvetica,sans-serif;
+		}
+        h1 {
+
+            font-weight: 400;
+            font-size: 50px;
+            margin-bottom:0px;
+        }
+
+        
+        h3 { 
+            font-weight: 400;
+            font-size:9px;
+        }
+        
+		
+        rect { 
+            stroke: white;
+            stroke-width: 2px;
+            fill: white;
+        }
+        
+        text {
+            fill:white;
+            font-size:35px;
+            opacity: 0.85;
+            font-family: Avenir, Helvetica, Arial, sans-serif;
+            font-weight:lighter;
+            
+        }
+        
+        text.title { 
+            font-size: 32px;
+            text-anchor: end;
+            opacity: 0.85;
+        }
+        
+
+  
+	</style>
+	
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script>
+        var margin = {top: 20, right: 20, bottom:50, left: 70}, 
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+        //Time parser
+        var parseTime = d3.timeParse('%Y-%m-%d')
+        
+        //Ranges: 
+        var x = d3.scaleTime().range([0, width]);
+        var y = d3.scalerLinear().range([height, 0]);
+        
+        var valueline = d3.line()
+            .x(function(d) { return x(d.date);})
+            .y(function(d) { return y(d.corona);});
+        
+		// variables and scripts
+		var data;	// to hold the data
+		
+		// function to get the data from file
+		function getData() {
+			d3.csv("https://raw.githubusercontent.com/benartuso/covid/master/jan_mentions_per_day.csv").then(function(raw_data) {
+                raw_data.forEach(function(d) {
+                    d.date = parseTime(d.date);
+                    d.corona = +d.corona;
+                })
+				data = raw_data;
+				draw();
+			});
+		}
+		
+		// declare some base variables
+        
+		// draw things
+		function draw() {
+			// setup some things
+            
+            var linegraph = d3.select("body").append("svg")
+            .attr("width", width+margin.left+margin.right)
+            .attr("height", height+margin.top+margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            
+            //x.domain(d3.extent(data, function(d) { return d.date; }));
+            y.domain([0, d3.max(data, function(d) { return d.corona; })]);
+            
+            
+            
+            //Add the line path. 
+           // drawArea.append("path").data([data])
+             //   .attr("class", "line")
+               // .attr("d", valueline);
+            
+            // Add the x axis 
+            //svg.append("g")
+              //  .call(d3.axisBottom(x));
+            
+            // Add the y axis 
+            //svg.append("g")
+              //  .call(d3.axisLeft(y));
+            
+            
+            
+            var circles = linegraph.selectAll("circle")
+            .data(data).enter().append("circle")
+                .attr("cx", 200)
+                .attr("cy", 200)
+                .attr("r", 200)
+                .style("fill", "purple")
+            
+        }
+        
+	</script>
+</head>
+<body onload="getData()">
+	
+</body>
+</html>
